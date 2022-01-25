@@ -1,17 +1,25 @@
 package edu.hznu.crypto.algsm2demo;
 
-import org.bouncycastle.asn1.gm.GMNamedCurves;
-import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
-import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.ECGenParameterSpec;
 
 /**
@@ -21,7 +29,7 @@ import java.security.spec.ECGenParameterSpec;
  * @date 2018-12-20 10:42:22
  */
 public class AlgSm2Demo {
-    public static void main(String[] args) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, SignatureException {
+    public static void main(String[] args) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, SignatureException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException, InvalidCipherTextException {
         // 获取SM2椭圆曲线的参数
         final ECGenParameterSpec sm2Spec = new ECGenParameterSpec("sm2p256v1");
         // 获取一个椭圆曲线类型的密钥对生成器
@@ -79,5 +87,11 @@ public class AlgSm2Demo {
         signature.update(plainText);
         // 验签
         System.out.println("Signature verify result: " + signature.verify(signatureValue));
+
+        String plainText2 = "hello sm2";
+        String encrypted = SM2Util.encrypt(plainText2, publicKey);
+        System.out.println("encrypted:" + encrypted);
+        String result = new String(SM2Util.decrypt(encrypted, privateKey));
+        System.out.println("result:" + result);
     }
 }
